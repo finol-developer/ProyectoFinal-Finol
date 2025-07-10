@@ -24,6 +24,7 @@ function obtenerProductos() {
       }
     })
     .catch(error => {
+      Swal.fire('Error', 'No se pudieron cargar los bares.', 'error');
       console.error("Error al obtener productos:", error);
     });
 }
@@ -47,27 +48,40 @@ function seleccionarBar(index) {
 
 votacionForm.addEventListener("submit", function (e) {
   e.preventDefault();
-  const datos = new FormData(votacionForm);
-  const puntajes = [
-    parseInt(datos.get("atencion")),
-    parseInt(datos.get("rapidez")),
-    parseInt(datos.get("tragos")),
-    parseInt(datos.get("comida")),
-    parseInt(datos.get("precios")),
-    parseInt(datos.get("limpieza")),
-  ];
 
-  const bar = {
-    nombre: barSeleccionado.nombre,
-    puntajes,
-  };
+  Swal.fire({
+    title: '¿Enviar votación?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, enviar',
+    cancelButtonText: 'Cancelar'
+  }).then(result => {
+    if (result.isConfirmed) {
+      const datos = new FormData(votacionForm);
+      const puntajes = [
+        parseInt(datos.get("atencion")),
+        parseInt(datos.get("rapidez")),
+        parseInt(datos.get("tragos")),
+        parseInt(datos.get("comida")),
+        parseInt(datos.get("precios")),
+        parseInt(datos.get("limpieza")),
+      ];
 
-  eleccionUsuarios.push(bar);
-  localStorage.setItem("rankingBares", JSON.stringify(eleccionUsuarios));
+      const bar = {
+        nombre: barSeleccionado.nombre,
+        puntajes,
+      };
 
-  votacionForm.reset();
-  formularioDiv.classList.add("hidden");
-  mostrarRanking();
+      eleccionUsuarios.push(bar);
+      localStorage.setItem("rankingBares", JSON.stringify(eleccionUsuarios));
+
+      votacionForm.reset();
+      formularioDiv.classList.add("hidden");
+      mostrarRanking();
+
+      Swal.fire('¡Gracias!', 'Tu votación ha sido guardada.', 'success');
+    }
+  });
 });
 
 function calcularPuntajeTotal(puntajes) {
@@ -127,3 +141,4 @@ function inicializarMapa() {
 }
 
 obtenerProductos();
+
